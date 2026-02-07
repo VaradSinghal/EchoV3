@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.api.endpoints.auth import router as auth_router
+from app.api.endpoints.repositories import router as repositories_router
+from app.api.endpoints.webhooks import router as webhooks_router
 from app.api.middleware import JWTAuthMiddleware, RateLimitMiddleware, RequestLoggingMiddleware
 
 app = FastAPI(
@@ -26,6 +28,8 @@ app.add_middleware(JWTAuthMiddleware)
 
 # Include routers
 app.include_router(auth_router)
+app.include_router(repositories_router)
+app.include_router(webhooks_router)
 
 @app.get("/")
 def root():

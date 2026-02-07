@@ -1,5 +1,5 @@
-from typing import List, Union
-from pydantic import AnyHttpUrl, validator
+from typing import List, Union, Optional
+from pydantic import AnyHttpUrl, field_validator
 from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
@@ -7,9 +7,10 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     
     # CORS
-    BACKEND_CORS_ORIGINS: List[AnyHttpUrl] = []
+    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:3000"]
 
-    @validator("BACKEND_CORS_ORIGINS", pre=True)
+    @field_validator("BACKEND_CORS_ORIGINS", mode="before")
+    @classmethod
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> List[str]:
         if isinstance(v, str) and not v.startswith("["):
             return [i.strip() for i in v.split(",")]
@@ -17,15 +18,15 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    # Supabase
-    SUPABASE_URL: str
-    SUPABASE_KEY: str
-    SUPABASE_JWT_SECRET: str
+    # Supabase - optional for local dev
+    SUPABASE_URL: str = "https://your-project.supabase.co"
+    SUPABASE_KEY: str = "your-anon-key"
+    SUPABASE_JWT_SECRET: str = "your-jwt-secret"
     
-    # GitHub OAuth
-    GITHUB_CLIENT_ID: str
-    GITHUB_CLIENT_SECRET: str
-    GITHUB_REDIRECT_URI: str
+    # GitHub OAuth - optional for local dev
+    GITHUB_CLIENT_ID: str = ""
+    GITHUB_CLIENT_SECRET: str = ""
+    GITHUB_REDIRECT_URI: str = "http://localhost:8000/api/auth/github/callback"
 
     class Config:
         case_sensitive = True
